@@ -28,7 +28,7 @@ public class ClubeDoLivro {
 			switch (opcao) {
 				case 1:	
 					System.out.print("\nInforme o código: "); 
-					int codigo = Integer.parseInt(leitor.nextLine());
+					int codigo = Integer.parseInt(leitor.nextLine());					
 					System.out.print("Informe o título do livro: ");
 					String titulo = leitor.nextLine();
 					System.out.print("Informe o nome do Autor ");
@@ -44,6 +44,9 @@ public class ClubeDoLivro {
 				break;
 				case 2: 
 					System.out.print("Informe o endereço do aquivo CSV");
+					break;
+				case 3:
+					
 				case 0:
 					System.exit(0);
 					break;
