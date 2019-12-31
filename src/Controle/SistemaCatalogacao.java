@@ -10,53 +10,197 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Modelo.Ano;
+import Modelo.Arvore;
+import Modelo.Autor;
 import Modelo.Livro;
+import Modelo.No;
 
 public class SistemaCatalogacao {
+	Arvore<Livro> livros = new Arvore<Livro>();
+	Arvore<Autor> autores = new Arvore<Autor>();
+	Arvore<Ano> anos = new Arvore<Ano>();
 	File arquivo = new File("base.csv");
 	boolean existe = arquivo.exists();
+	Autor autor;
+	Ano ano;
 
-	public ArrayList baseLivros() throws IOException {
-		ArrayList base = new ArrayList();
+	public boolean cadastrarLivro(int codigo, String titulo, String author, char[] mes, int year, String link) {
+		Livro livro = new Livro(codigo, titulo, author, mes, year, link);
+		livros.inserir(codigo, livro);
+		autor = (Autor) autores.buscar(livro.getAutor().getNome()).getObjeto();
+		if (autor != null) {
+			autor.adicionarLivro(livro);
+		} else {
+			autor = new Autor(livro.getAutor().getNome());
+			autor.adicionarLivro(livro);
+			autores.inserir(autor.getNome(), autor);
+		}		
+		
+		No n = anos.buscar(livro.getAno());
+		if (n != null) {
+			ano = (Ano) n.getObjeto();
+			ano.adicionarLivro(livro);
+		} else {
+			ano = new Ano(livro.getAno());
+			ano.adicionarLivro(livro);
+			anos.inserir(livro.getAno(), ano);
+		}
+		return true;
+	}
+
+	public boolean carregarBase(String endereco) throws IOException {
+		File base = new File(endereco);
+		if (base.exists()) {
+			FileReader leitor = new FileReader(base);
+			BufferedReader buffer = new BufferedReader(leitor);
+			while (buffer.ready()) {
+				String[] dados = buffer.readLine().split(";");
+				System.out.println(dados[0]);
+				try {
+				Livro livro = new Livro(Integer.parseInt(dados[0]), dados[1], dados[2], (dados[3]).toCharArray(),
+						Integer.parseInt(dados[4]), dados[5]);
+				livros.inserir(livro.getN_ebook(), livro);
+				No n = autores.buscar(livro.getAutor().getNome());
+				if (n != null) {
+					autor = (Autor) n.getObjeto();
+					autor.adicionarLivro(livro);						
+				} else {
+					autor = new Autor(livro.getAutor().getNome());
+					autor.adicionarLivro(livro);
+					autores.inserir(autor.getNome(), autor);
+				}
+				
+				n = anos.buscar(livro.getAno());
+				if (n != null) {
+					ano = (Ano) n.getObjeto();
+					ano.adicionarLivro(livro);
+				} else {
+					ano = new Ano(livro.getAno());
+					ano.adicionarLivro(livro);
+					anos.inserir(livro.getAno(), ano);
+				}
+				
+				} catch(NumberFormatException ex){
+					System.out.println("Dados Inválidos");
+				}
+				
+			}
+		}
+		return true;
+	}
+
+	public boolean gravarLivros() throws IOException {
+		gravarLivros(livros.getRaiz());
+		return true;
+	}
+
+	private void gravarLivros(No n) throws IOException {
+		if (n != null) {
+			Livro livro = (Livro) n.getObjeto();
+			String livroTexto = livro.getN_ebook() + ";" + livro.getTitulo() + ";" + livro.getAutor().getNome() + ";"
+					+ String.copyValueOf(livro.getMes()) + ";" + livro.getAno() + ";" + livro.getLink();
+			if (existe) {
+				if (buscarLivro(livro.getN_ebook()) == null) {
+					FileWriter escritor = new FileWriter(arquivo, true);
+					BufferedWriter buffer = new BufferedWriter(escritor);
+					buffer.write(livroTexto);
+					buffer.newLine();
+					buffer.close();
+					escritor.close();
+				}
+			}
+			if (n.getEsquerda() != null) {
+				gravarLivros(n.getEsquerda());
+			}
+			if (n.getDireita() != null) {
+				gravarLivros(n.getDireita());
+			}
+		}
+	}
+
+	public void listarAutoresQtde() {
+		if (autores.getRaiz() != null)
+			listarAutoresQtde(autores.getRaiz());
+		else
+			System.out.println("Base vazia");
+	}
+
+	private void listarAutoresQtde(No n) {
+		if (n != null) {
+			autor = (Autor) n.getObjeto();
+			System.out.println(autor.getNome() + " (" + autor.getQuantidade() + ")");
+		}
+		if (n.getEsquerda() != null)
+			listarAutoresQtde(n.getEsquerda());
+
+		if (n.getDireita() != null)
+			listarAutoresQtde(n.getDireita());
+
+	}
+
+	
+	public void exibirLivroAutor() {
+		exibirLivroAutor(autores.getRaiz());
+	}
+	
+	private void exibirLivroAutor(No n) {
+		if (n != null) {
+			autor = (Autor) n.getObjeto();
+			System.out.println("\nLivros do Autor: " + autor.getNome());
+			autor.exibirLivros();
+		}
+		
+		if (n.getEsquerda() != null)
+			exibirLivroAutor(n.getEsquerda());
+		
+		if (n.getDireita() != null) 
+			exibirLivroAutor(n.getDireita());
+		
+	}
+	
+	public void exibirLivros() {
+		livros.emOrdem();
+	}
+	
+	public Livro buscarLivro(int codigo) {
+		No n = livros.buscar(String.valueOf(codigo));
+		if (n != null)
+			return (Livro)n.getObjeto();
+		else
+			return null;
+	}
+		
+	public void exibirLivroAno(int codigo) {
+		No n = anos.buscar(codigo);
+		if (n != null) {
+			ano = (Ano)n.getObjeto();
+			System.out.println("\n\nLivros [" + ano.getAno() + "]");
+			ano.exibirLivros();
+		} else {
+			System.out.println("Não há livros no ano informado!");
+		}				
+	}
+	
+	public void excluirLivro(int codigo) {
+		livros.remover(String.valueOf(codigo));
+	}
+
+	public Arvore<Livro> baseLivros() throws IOException {
+		Arvore base = new Arvore();
 		if (existe) {
 			FileReader leitor = new FileReader(arquivo);
 			BufferedReader buffer = new BufferedReader(leitor);
 			while (buffer.ready()) {
 				String[] dados = buffer.readLine().split(";");
+				System.out.println(dados[0]);
 				Livro livro = new Livro(Integer.parseInt(dados[0]), dados[1], dados[2], (dados[3]).toCharArray(),
 						Integer.parseInt(dados[4]), dados[5]);
-				base.add(livro);
+				base.inserir(livro.getN_ebook(), livro);
 			}
 		}
 
 		return base;
 	}
 
-	public Livro buscarLivro(int codigo) throws IOException {
-		ArrayList livros = baseLivros();
-		for (int c = 0; c < livros.size(); c++) {
-			Livro l = (Livro) livros.get(c);
-			if (l.getN_ebook() == codigo) {
-				return l;
-			}
-		}
-		return null;
-	}
-
-	public boolean cadastrarLivro(Livro l) throws IOException {
-		String livro = l.getN_ebook() + ";" + l.getTitulo() + ";" + l.getAutor().getNome() + ";"
-				+ String.copyValueOf(l.getMes()) + ";" + l.getAno() + ";" + l.getLink();
-		if (existe) {
-			if (buscarLivro(l.getN_ebook()) == null) {
-				FileWriter escritor = new FileWriter(arquivo, true);
-				BufferedWriter buffer = new BufferedWriter(escritor);
-				buffer.write(livro);
-				buffer.newLine();
-				buffer.close();
-				escritor.close();
-				return true;
-			}
-		}
-		return false;
-	}
 }

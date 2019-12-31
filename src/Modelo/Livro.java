@@ -1,6 +1,6 @@
 package Modelo;
 
-public class Livro {
+public class Livro{
 	private int n_ebook;
 	private String titulo;
 	private Autor autor;
@@ -15,8 +15,7 @@ public class Livro {
 		this.mes = mes;
 		this.ano = ano;
 		this.link = link;
-	}
-	
+	}	
 	
 	public int getN_ebook() {
 		return n_ebook;
@@ -59,5 +58,15 @@ public class Livro {
 		System.out.print("Código: " + n_ebook);
 		System.out.print("Titulo: " + titulo);
 		System.out.print("Autor: " + autor.getNome());		
+	}
+	
+	public int compareTo(String c) {	
+		int codigo = Integer.parseInt(c);
+		if (n_ebook > codigo)
+			return 1;
+		else if (n_ebook < codigo)
+			return -1;
+		else
+			return 0;
 	}
 }
