@@ -45,7 +45,7 @@ public class No<T> {
 		this.altura = altura;
 	}
 
-	public Object getObjeto() {
+	public T getObjeto() {
 		return objeto;
 	}
 

@@ -138,12 +138,11 @@ public class Arvore<T> {
 	public No inserir(int codigo, Object objeto, No<T> n) {
 		if (n == null)
 			n = new No(Integer.toString(codigo), objeto);
-		int codigoNo = Integer.parseInt(n.getCodigo());
-		if (codigo == codigoNo)
-			System.out.println("Código de livro já utilizado!");
-		else if (codigo < codigoNo)
+		else if (codigo == Integer.parseInt(n.getCodigo()))
+			System.out.println(codigo + "Código de livro já utilizado!");
+		else if (codigo < Integer.parseInt(n.getCodigo()))
 			n.setEsquerda(inserir(codigo, objeto, n.getEsquerda()));
-		else if (codigo > codigoNo)
+		else if (codigo > Integer.parseInt(n.getCodigo()))
 			n.setDireita(inserir(codigo, objeto, n.getDireita()));
 
 		n = balancear(n);
@@ -210,7 +209,10 @@ public class Arvore<T> {
 				n.setValor(menorDireita(n.getDireita()).getCodigo());
 				n.setDireita(remover(n.getCodigo(), n.getDireita()));
 			} else {
-				n = (n.getEsquerda() != null) ? n.getEsquerda() : n.getDireita();
+				if (n.getEsquerda() != null)
+					n = n.getEsquerda();
+				else
+					n = n.getDireita();
 			}
 		}
 		return balancear(n);
@@ -226,7 +228,7 @@ public class Arvore<T> {
 			System.out.println("Elemento não encontrado para remoção!");
 			return null;
 		}
-		
+
 		int codigoNo = Integer.parseInt(n.getCodigo());
 		System.out.println("Percorrendo No" + n.getCodigo());
 		if (codigo < codigoNo) {
@@ -252,7 +254,10 @@ public class Arvore<T> {
 				n.setValor(menorDireita(n.getDireita()).getCodigo());
 				n.setDireita(remover(n.getCodigo(), n.getDireita()));
 			} else {
-				n = (n.getEsquerda() != null) ? n.getEsquerda() : n.getDireita();
+				if (n.getEsquerda() != null)
+					n = n.getEsquerda();
+				else
+					n = n.getDireita();
 			}
 		}
 		return balancear(n);
@@ -264,10 +269,10 @@ public class Arvore<T> {
 
 	private No buscar(No n, int codigo) {
 		while (n != null) {
-			if (codigo == Integer.parseInt(n.getCodigo())) 				
+			if (codigo == Integer.parseInt(n.getCodigo()))
 				return n;
-			else if (codigo < Integer.parseInt(n.getCodigo())) 
-				n = n.getEsquerda();			
+			else if (codigo < Integer.parseInt(n.getCodigo()))
+				n = n.getEsquerda();
 			else
 				n = n.getDireita();
 		}
@@ -280,13 +285,13 @@ public class Arvore<T> {
 
 	private No buscar(No n, String codigo) {
 		while (n != null) {
-			if (codigo.equalsIgnoreCase(n.getCodigo())) 				
-				return n;			
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0) 
-				n = n.getEsquerda();			
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0) 
-				n = n.getDireita();			
-		}		
+			if (codigo.equalsIgnoreCase(n.getCodigo()))
+				return n;
+			else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0)
+				n = n.getEsquerda();
+			else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0)
+				n = n.getDireita();
+		}
 		return null;
 	}
 

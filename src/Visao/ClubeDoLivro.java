@@ -31,7 +31,8 @@ public class ClubeDoLivro {
 			opcao = Integer.parseInt(leitor.nextLine());
 			switch (opcao) {
 			case 1:
-				/** Cadastrar - Livro: permite a inserção de um livro no sistema da batata */
+				/** Cadastrar - Livro: 
+				 * permite a inserção de um livro no sistema da batata */
 				System.out.print("\nInforme o código: ");
 				int codigo = Integer.parseInt(leitor.nextLine());
 				System.out.print("Informe o título do livro: ");
@@ -53,7 +54,7 @@ public class ClubeDoLivro {
 				break;
 
 			case 2:
-				/** Carregar base de dados */
+				/** Carregar base de dados: permite a insercao de livros a partir de um arquivo de texto */
 				System.out.print("Informe o endereço do aquivo CSV: ");
 				String endereco = leitor.nextLine();
 				if (batata.carregarBase(endereco))
@@ -61,6 +62,7 @@ public class ClubeDoLivro {
 				else
 					System.out.println("Falha em carregar a base de arquivos");
 				break;
+				
 			case 3:
 				/** Gravar arquivo */
 				if (salvar)
@@ -68,11 +70,15 @@ public class ClubeDoLivro {
 						System.out.println("Alterações realizadas com sucesso!");
 						salvar = false;
 					} else
-						System.out.println("Não há nada a ser salvo");
+						System.out.println("Alteração não realizada");
+				else
+					System.out.println("Não há nada a ser salvo");
 				break;
 			case 4:
 				/** Listar Autores Quantidade */
-				batata.listarAutoresQtde();
+				if(batata.listarAutoresQtde() == false) {
+					System.out.println("Não há livros cadastrados");
+				}
 				break;
 			case 5:
 				/** Listar Autor/Livros */
@@ -104,6 +110,12 @@ public class ClubeDoLivro {
 				System.out.println("Informe o nº do ebook a ser excluído");
 				codigo = Integer.parseInt(leitor.nextLine());
 				batata.excluirLivro(codigo);
+				break;
+			case 10:
+				batata.verificar();
+				break;
+			case 11:
+				System.out.println(batata.getQt());
 				break;
 			case 0:
 				if (salvar) {
