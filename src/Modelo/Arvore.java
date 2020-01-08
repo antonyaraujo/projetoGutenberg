@@ -150,39 +150,6 @@ public class Arvore<T> {
 		return n;
 	}
 
-	/*
-	 * private No inserir(String codigo, Object objeto, No n) { if (n == null) n =
-	 * new No(codigo, objeto); // Se a árvore estiver vazia, simplesmente insere
-	 * 
-	 * if(codigo.compareToIgnoreCase(n.getCodigo()) < 0)
-	 * n.setEsquerda(inserir(codigo, n.getObjeto(),n.getEsquerda())); else if
-	 * (codigo.compareToIgnoreCase(n.getCodigo()) > 0) n.setDireita(inserir(codigo,
-	 * n.getObjeto(),n.getDireita())); else return n;
-	 * 
-	 * n.setAltura(Math.max(altura(n.getEsquerda()), altura(n.getEsquerda())) + 1);
-	 * 
-	 * int fator = fatorBalanceamento(n);
-	 * 
-	 * if (fator > 1 && codigo.compareToIgnoreCase(n.getEsquerda().getCodigo()) <
-	 * 0){ System.out.println("Rotação simples a esquerda"); return
-	 * rotacaoDireita(n); }
-	 * 
-	 * 
-	 * if (fator < -1 && codigo.compareToIgnoreCase(n.getDireita().getCodigo()) > 0)
-	 * { System.out.println("Rotação simples a direita"); return rotacaoEsquerda(n);
-	 * }
-	 * 
-	 * if(fator > 1 && codigo.compareToIgnoreCase(n.getEsquerda().getCodigo()) > 0)
-	 * { n.setEsquerda(rotacaoEsquerda(n.getEsquerda()));
-	 * System.out.println("Rotação dupla a esquerda"); return rotacaoDireita(n); }
-	 * 
-	 * if(fator < -1 && codigo.compareToIgnoreCase(n.getDireita().getCodigo()) < 0)
-	 * { n.setDireita(rotacaoDireita(n.getDireita()));
-	 * System.out.println("Rotação dupla a direita"); return rotacaoEsquerda(n); }
-	 * 
-	 * return n; }
-	 */
-
 	// Encontra o no de menor código a direita do nó atual
 	private No menorDireita(No n) {
 		if (n.getEsquerda() == null) {
@@ -297,20 +264,14 @@ public class Arvore<T> {
 
 	private No buscar(No n, int codigo) {
 		while (n != null) {
-			if (codigo == Integer.parseInt(n.getCodigo())) {
-				System.out.println("Livro de código" + codigo + "encontrado!");
+			if (codigo == Integer.parseInt(n.getCodigo())) 				
 				return n;
-			}
-
-			else if (codigo < Integer.parseInt(n.getCodigo())) {
-				n = n.getEsquerda();
-			}
-
-			else {
+			else if (codigo < Integer.parseInt(n.getCodigo())) 
+				n = n.getEsquerda();			
+			else
 				n = n.getDireita();
-			}
 		}
-		return n;
+		return null;
 	}
 
 	public No buscar(String codigo) {
@@ -319,20 +280,13 @@ public class Arvore<T> {
 
 	private No buscar(No n, String codigo) {
 		while (n != null) {
-			if (codigo.equalsIgnoreCase(n.getCodigo())) {
-				System.out.println("Livro de código" + codigo + "encontrado!");
-				return n;
-			}
-
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0) {
-				n = n.getEsquerda();
-			}
-
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0) {
-				n = n.getDireita();
-			}
-		}
-		System.out.println("Elemento " + codigo + " Não encontrado");
+			if (codigo.equalsIgnoreCase(n.getCodigo())) 				
+				return n;			
+			else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0) 
+				n = n.getEsquerda();			
+			else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0) 
+				n = n.getDireita();			
+		}		
 		return null;
 	}
 

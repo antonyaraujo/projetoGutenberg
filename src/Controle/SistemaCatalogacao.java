@@ -24,24 +24,42 @@ public class SistemaCatalogacao {
 	boolean existe = arquivo.exists();
 	Autor autor;
 	Ano ano;
+	Livro livro;
 
+	/** Permite a inserção de um novo livro na árvore de livros
+	 *  
+	 * @param codigo
+	 * @param titulo
+	 * @param author
+	 * @param mes
+	 * @param year
+	 * @param link
+	 * @return True ou False, a depnder do resultado da operacao
+	 */
 	public boolean cadastrarLivro(int codigo, String titulo, String author, char[] mes, int year, String link) {
-		Livro livro = new Livro(codigo, titulo, author, mes, year, link);
-		livros.inserir(codigo, livro);
-		autor = (Autor) autores.buscar(livro.getAutor().getNome()).getObjeto();
-		if (autor != null) {
+		livro = new Livro(codigo, titulo, author, mes, year, link);
+
+		livros.inserir(codigo, livro); // Insere o livro na arvore de livros
+		
+		// Insere o livro nos livros do autor indicado
+		No n = autores.buscar(livro.getAutor().getNome());
+		if (n != null) {
+			autor = (Autor) n.getObjeto();
 			autor.adicionarLivro(livro);
 		} else {
+			// Se o autor nao existir, ele e criado e o livro entao inserido
 			autor = new Autor(livro.getAutor().getNome());
 			autor.adicionarLivro(livro);
 			autores.inserir(autor.getNome(), autor);
-		}		
+		}
 		
-		No n = anos.buscar(livro.getAno());
+		// Insere o livro nos livros do ano indicado
+		n = anos.buscar(livro.getAno());
 		if (n != null) {
 			ano = (Ano) n.getObjeto();
 			ano.adicionarLivro(livro);
 		} else {
+			// Se o ano nao existir ele e criado e o livro adicionado ao ano
 			ano = new Ano(livro.getAno());
 			ano.adicionarLivro(livro);
 			anos.inserir(livro.getAno(), ano);
@@ -49,11 +67,18 @@ public class SistemaCatalogacao {
 		return true;
 	}
 
+	/**
+	 * Acrescenta a arvore de livros os livros existentes em um arquivo de texto
+	 * @param endereco
+	 * @return verdadeiro ou falso a depender da realizacao da operacao
+	 * @throws IOException
+	 */
 	public boolean carregarBase(String endereco) throws IOException {
 		File base = new File(endereco);
 		if (base.exists()) {
 			FileReader leitor = new FileReader(base);
 			BufferedReader buffer = new BufferedReader(leitor);
+			
 			while (buffer.ready()) {
 				String[] dados = buffer.readLine().split(";");
 				System.out.println(dados[0]);
