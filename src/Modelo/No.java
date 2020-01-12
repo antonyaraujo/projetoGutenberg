@@ -1,41 +1,40 @@
 package Modelo;
 
-public class No<T> {
-	private String codigo;
+import java.util.Comparator;
+
+public class No<T extends Comparable<T>> implements Comparable<T>{	
 	private T objeto;
-	private No esquerda;
-	private No direita;
+	private No<T> esquerda, direita;	
 	private int altura;
+	private Comparator<T> comparador;
 	
-	public No(String codigo, T objeto) {		
-		this.codigo = codigo;
+	public No(T objeto, Comparator<T> comparador) {				
 		this.objeto = objeto;
+		this.comparador = comparador;
 		esquerda = direita = null;
 		altura = 0;
 	}
 	
-	public String getCodigo() {
-		return codigo;
-	}
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
-	}
 	public T getValor() {
 		return objeto;
 	}
+	
 	public void setValor(Object Object) {
 		this.objeto = objeto;
 	}
-	public No getEsquerda() {
+	
+	public No<T> getEsquerda() {
 		return esquerda;
 	}
-	public void setEsquerda(No esquerda) {
+	
+	public void setEsquerda(No<T> esquerda) {
 		this.esquerda = esquerda;
 	}
+	
 	public No getDireita() {
 		return direita;
 	}
-	public void setDireita(No direita) {
+	public void setDireita(No<T> direita) {
 		this.direita = direita;
 	}
 	public int getAltura() {
@@ -52,4 +51,13 @@ public class No<T> {
 	public void setObjeto(T objeto) {
 		this.objeto = objeto;
 	}
+
+	@Override
+	public int compareTo(T obj) {
+		if (comparador == null) 			
+			return objeto.compareTo(obj);
+		return comparador.compare(objeto, obj);
+	}
+
+		
 }

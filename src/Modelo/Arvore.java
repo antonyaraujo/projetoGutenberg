@@ -1,14 +1,18 @@
 package Modelo;
 
+import java.util.Comparator;
+
 import Modelo.No;
 
-public class Arvore<T> {
-	private No raiz;
-
+public class Arvore<T extends Comparable<T>> {
+	private No<T> raiz;
+	private Comparator<T> comparador;
+	
 	public Arvore() {
-		raiz = null;
+		raiz = null;		
 	}
 
+	
 	public void setRaiz(No raiz) {
 		this.raiz = raiz;
 	}
@@ -111,26 +115,26 @@ public class Arvore<T> {
 		return rotacaoEsquerda(n);
 	}
 
-	public boolean inserir(String codigo, Object objeto) {
-		raiz = inserir(codigo, objeto, raiz);
+	public boolean inserir(T objeto) {
+		raiz = inserir(objeto, raiz);
 		return true;
 	}
 
-	private No inserir(String codigo, Object objeto, No n) {
-		if (n == null)
-			n = new No(codigo, objeto);
-		else if (codigo.equalsIgnoreCase(n.getCodigo()))
+	private No inserir(T objeto, No<T> no) {
+		if (no == null)
+			no = new No(objeto, comparador);
+		else if (no.compareTo(objeto) == 0)
 			System.out.println("Código já utilizado");
-		else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0)
-			n.setEsquerda(inserir(codigo, objeto, n.getEsquerda()));
-		else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0)
-			n.setDireita(inserir(codigo, objeto, n.getDireita()));
+		else if (no.compareTo(objeto) > 0)
+			no.setEsquerda(inserir(objeto, no.getEsquerda()));
+		else if (no.compareTo(objeto) < 0)
+			no.setDireita(inserir(objeto, no.getDireita()));
 
-		n = balancear(n);
-		return n;
+		no = balancear(no);
+		return no;
 	}
 
-	public boolean inserir(int codigo, Object objeto) {
+	/**public boolean inserir(int codigo, T objeto) {
 		raiz = inserir(codigo, objeto, raiz);
 		return true;
 	}
@@ -147,150 +151,88 @@ public class Arvore<T> {
 
 		n = balancear(n);
 		return n;
-	}
+	}*/
 
-	// Encontra o no de menor código a direita do nó atual
-	private No menorDireita(No n) {
-		if (n.getEsquerda() == null) {
-			return n;
-		} else {
-			n = n.getEsquerda();
-			return menorDireita(n);
-		}
+	public No<T> buscarMaior(){
+		return buscarMaior(raiz);
 	}
-
-	private String buscarMaior(No n) {
+	
+	private No<T> buscarMaior(No<T> n) {
 		while (n.getDireita() != null) {
 			n = n.getDireita();
 		}
-		System.out.println("Mairo elemento é: " + n.getValor());
-		return n.getCodigo();
+		System.out.println("Maior elemento é: " + n.getValor());
+		return n;
 	}
 
-	private String buscarMenor(No n) {
+	public No<T> buscarMenor(){
+		return buscarMenor(raiz);
+	}
+	
+	private No<T> buscarMenor(No<T> n) {
 		while (n.getEsquerda() != null) {
 			n = n.getEsquerda();
 		}
 		System.out.println("Menor elemento é: " + n.getValor());
-		return n.getCodigo();
+		return n;
 	}
 
-	public No remover(String codigo) {
+
+	public No remover(T codigo) {
 		raiz = remover(codigo, raiz);
 		return raiz;
 	}
 
-	private No remover(String codigo, No n) {
-		if (n == null) {
+	private No remover(T codigo, No<T> no) {
+		if (no == null) {
 			System.out.println("Elemento não encontrado para remoção!");
 			return null;
 		}
-		System.out.println("Percorrendo No" + n.getCodigo());
-		if (codigo.compareToIgnoreCase(n.getCodigo()) < 0) {
-			n.setEsquerda(remover(codigo, n.getEsquerda()));
-			return balancear(n);
-		} else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0) {
-			n.setDireita(remover(codigo, n.getDireita()));
-			return balancear(n);
+		
+		System.out.println("Percorrendo No" + no.getObjeto());
+		if (no.compareTo(codigo) < 0) {
+			no.setEsquerda(remover(codigo, no.getEsquerda()));
+			return balancear(no);
+		} else if (no.compareTo(codigo) > 0) {
+			no.setDireita(remover(codigo, no.getDireita()));
+			return balancear(no);
 		} else {
-			if (n.getEsquerda() == null && n.getDireita() == null) {
+			if (no.getEsquerda() == null && no.getDireita() == null) {
 				return null;
 			}
-			if (n.getEsquerda() == null) {
-				return n.getDireita();
+			else if (no.getEsquerda() == null) {
+				return no.getDireita();
 			}
-
-			if (n.getDireita() == null) {
-				return n.getEsquerda();
+			else if (no.getDireita() == null) {
+				return no.getEsquerda();
 			}
 
 			// DOIS FILHOS
-			else if (n.getEsquerda() != null && n.getDireita() != null) {
-				n.setValor(menorDireita(n.getDireita()).getCodigo());
-				n.setDireita(remover(n.getCodigo(), n.getDireita()));
+			else if (no.getEsquerda() != null && no.getDireita() != null) {
+				no.setValor(buscarMaior(no.getDireita()).getObjeto());
+				no.setDireita(remover(no.getObjeto(), no.getDireita()));
 			} else {
-				if (n.getEsquerda() != null)
-					n = n.getEsquerda();
+				if (no.getEsquerda() != null)
+					no = no.getEsquerda();
 				else
-					n = n.getDireita();
+					no = no.getDireita();
 			}
 		}
-		return balancear(n);
+		return balancear(no);
 	}
 
-	public No remover(int codigo) {
-		raiz = remover(codigo, raiz);
-		return raiz;
-	}
-
-	private No remover(int codigo, No n) {
-		if (n == null) {
-			System.out.println("Elemento não encontrado para remoção!");
-			return null;
-		}
-
-		int codigoNo = Integer.parseInt(n.getCodigo());
-		System.out.println("Percorrendo No" + n.getCodigo());
-		if (codigo < codigoNo) {
-			n.setEsquerda(remover(codigo, n.getEsquerda()));
-			return balancear(n);
-		} else if (codigo > codigoNo) {
-			n.setDireita(remover(codigo, n.getDireita()));
-			return balancear(n);
-		} else {
-			if (n.getEsquerda() == null && n.getDireita() == null) {
-				return null;
-			}
-			if (n.getEsquerda() == null) {
-				return n.getDireita();
-			}
-
-			if (n.getDireita() == null) {
-				return n.getEsquerda();
-			}
-
-			// DOIS FILHOS
-			else if (n.getEsquerda() != null && n.getDireita() != null) {
-				n.setValor(menorDireita(n.getDireita()).getCodigo());
-				n.setDireita(remover(n.getCodigo(), n.getDireita()));
-			} else {
-				if (n.getEsquerda() != null)
-					n = n.getEsquerda();
-				else
-					n = n.getDireita();
-			}
-		}
-		return balancear(n);
-	}
-
-	public No buscar(int codigo) {
+	public No buscar(T codigo) {
 		return buscar(raiz, codigo);
 	}
 
-	private No buscar(No n, int codigo) {
-		while (n != null) {
-			if (codigo == Integer.parseInt(n.getCodigo()))
-				return n;
-			else if (codigo < Integer.parseInt(n.getCodigo()))
-				n = n.getEsquerda();
+	private No buscar(No no, T codigo) {
+		while (no != null) {
+			if (no.compareTo(codigo) == 0)
+				return no;
+			else if (no.compareTo(codigo) < 0)
+				no = no.getEsquerda();
 			else
-				n = n.getDireita();
-		}
-		return null;
-	}
-
-	public No buscar(String codigo) {
-		return buscar(raiz, codigo);
-	}
-
-	private No buscar(No n, String codigo) {
-		while (n != null) {
-			if (codigo.equalsIgnoreCase(n.getCodigo()))
-				return n;
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) < 0)
-				n = n.getEsquerda();
-			else if (codigo.compareToIgnoreCase(n.getCodigo()) > 0)
-				n = n.getDireita();
+				no = no.getDireita();
 		}
 		return null;
 	}
@@ -299,17 +241,17 @@ public class Arvore<T> {
 		emOrdem(raiz);
 	}
 
-	private void emOrdem(No n) {
-		if (n != null) {
-			Livro l = (Livro) n.getObjeto();
-			System.out.println("[" + n.getCodigo() + "]" + " " + l.getTitulo());
+	private void emOrdem(No<T> no) {
+		if (no != null) {
+			Livro l = (Livro) no.getObjeto();
+			System.out.println("[" + l.getN_ebook() + "]" + " " + l.getTitulo());
 		}
 
-		if (n.getEsquerda() != null)
-			emOrdem(n.getEsquerda());
+		if (no.getEsquerda() != null)
+			emOrdem(no.getEsquerda());
 
-		if (n.getDireita() != null)
-			emOrdem(n.getDireita());
+		if (no.getDireita() != null)
+			emOrdem(no.getDireita());
 	}
 
 }

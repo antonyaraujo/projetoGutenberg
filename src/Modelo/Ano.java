@@ -2,7 +2,7 @@ package Modelo;
 
 import java.util.ArrayList;
 
-public class Ano {
+public class Ano implements Comparable<Ano>{
 	private int ano;
 	private ArrayList<Livro> livros;
 	
@@ -19,8 +19,11 @@ public class Ano {
 	}
 	
 	public boolean adicionarLivro(Livro l) {
-		livros.add(l);
-		return true;
+		return livros.add(l);
+	}
+	
+	public boolean removerLivro(Livro l) {
+		return livros.remove(l);
 	}
 
 	public int getQuantidade() {
@@ -29,11 +32,32 @@ public class Ano {
 	
 	public void exibirLivros() {
 		for (int c = 0; c < livros.size(); c++) {
-			System.out.println("\n" + (c+1) + ". [" + livros.get(c).getN_ebook() + "] [" + livros.get(c).getTitulo() + "]");
-			System.out.println("Autor: [" + livros.get(c).getAutor().getNome() + "]");
-			System.out.println("Lançamento: [" + String.valueOf(livros.get(c).getMes()) + " de " + livros.get(c).getAno() + "]");
-			System.out.println("Disponível em: [" + livros.get(c).getLink() + "]");						
+			System.out.println(c+1 + ". ");
+			 livros.get(c).imprimir();
 		}
 	}
+
+	public String listagemLivros(){
+		String texto = "";
+		for(int c = 0; c < livros.size(); c++)
+			texto += (livros.get(c).getTitulo() + "\n");
+		return texto;		
+	}
+	
+	@Override
+	public String toString() {
+		return String.valueOf(ano);
+	}
+	
+	@Override
+	public int compareTo(Ano a) {
+		if (this.ano > a.getAno())
+			return 1;
+		if (this.ano < a.getAno())
+			return -1;
+		return 0;			
+	}
+	
+	
 	
 }

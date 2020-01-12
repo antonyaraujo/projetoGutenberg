@@ -82,7 +82,12 @@ public class ClubeDoLivro {
 				break;
 			case 5:
 				/** Listar Autor/Livros */
-				batata.exibirLivroAutor();
+				System.out.println("Informe o nome do autor: ");
+				String nome = leitor.nextLine();
+				if(batata.exibirLivroAutor(nome))
+					System.out.println("Arquivo " + nome + ".csv gerado com sucesso!!");
+				else
+					System.out.println("Autor não encontrado!");
 				break;
 			case 6:
 				/** Listar - Livros */
@@ -101,7 +106,7 @@ public class ClubeDoLivro {
 				break;
 			case 8:
 				/** Buscar Livro/Ano */
-				System.out.println("Informe um ano, xuxuzinho: ");
+				System.out.println("Informe um ano: ");
 				ano = Integer.parseInt(leitor.nextLine());
 				batata.exibirLivroAno(ano);
 				break;

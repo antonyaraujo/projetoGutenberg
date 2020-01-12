@@ -43,10 +43,10 @@ public class SistemaCatalogacao {
 	public boolean cadastrarLivro(int codigo, String titulo, String author, char[] mes, int year, String link) {
 		livro = new Livro(codigo, titulo, author, mes, year, link);
 
-		livros.inserir(codigo, livro); // Insere o livro na arvore de livros
+		livros.inserir(livro); // Insere o livro na arvore de livros
 		qt++;
 		// Insere o livro nos livros do autor indicado
-		No<Autor> noAutor = autores.buscar(livro.getAutor().getNome());
+		No<Autor> noAutor = autores.buscar(livro.getAutor());
 		if (noAutor != null) {
 			autor = noAutor.getObjeto();
 			autor.adicionarLivro(livro);
@@ -54,7 +54,7 @@ public class SistemaCatalogacao {
 			// Se o autor nao existir, ele e criado e o livro entao inserido
 			autor = new Autor(livro.getAutor().getNome());
 			autor.adicionarLivro(livro);
-			autores.inserir(autor.getNome(), autor); // insere o autor na arvore dos autores
+			autores.inserir(autor); // insere o autor na arvore dos autores
 		}
 
 		// Insere o livro nos livros do ano indicado
@@ -64,9 +64,9 @@ public class SistemaCatalogacao {
 			ano.adicionarLivro(livro);
 		} else {
 			// Se o ano nao existir ele e criado e o livro adicionado ao ano
-			ano = new Ano(livro.getAno());
+			ano = new Ano(livro.getAno().getAno());
 			ano.adicionarLivro(livro);
-			anos.inserir(livro.getAno(), ano); // Insere o ano na arvore dos anos
+			anos.inserir(livro.getAno()); // Insere o ano na arvore dos anos
 		}
 		return true;
 	}
@@ -89,18 +89,18 @@ public class SistemaCatalogacao {
 				try {
 					livro = new Livro(Integer.parseInt(dados[0]), dados[1], dados[2], (dados[3]).toCharArray(),
 							Integer.parseInt(dados[4]), dados[5]);
-					livros.inserir(livro.getN_ebook(), livro);
+					livros.inserir(livro);
 
 					// Insere o livro nos livros do autor indicado
-					No<Autor> noAutor = autores.buscar(livro.getAutor().getNome());
+					No<Autor> noAutor = autores.buscar(livro.getAutor());
 					if (noAutor != null) {
 						autor = noAutor.getObjeto();
 						autor.adicionarLivro(livro);
 					} else {
 						// Se o autor nao existir, ele e criado e o livro entao inserido
-						autor = new Autor(livro.getAutor().getNome());
+						autor = livro.getAutor();
 						autor.adicionarLivro(livro);
-						autores.inserir(autor.getNome(), autor); // insere o autor na arvore dos autores
+						autores.inserir(autor); // insere o autor na arvore dos autores
 					}
 
 					// Insere o livro nos livros do ano indicado
@@ -110,9 +110,9 @@ public class SistemaCatalogacao {
 						ano.adicionarLivro(livro);
 					} else {
 						// Se o ano nao existir ele e criado e o livro adicionado ao ano
-						ano = new Ano(livro.getAno());
+						ano = (livro.getAno());
 						ano.adicionarLivro(livro);
-						anos.inserir(livro.getAno(), ano); // Insere o ano na arvore dos anos
+						anos.inserir(ano); // Insere o ano na arvore dos anos
 					}
 					qt++;
 				} catch (NumberFormatException ex) {
@@ -178,7 +178,7 @@ public class SistemaCatalogacao {
 			if (autor.getQuantidade() > 1)
 				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livros]");
 			else
-				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livro]");
+				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livro]");						
 		}
 		if (n.getEsquerda() != null)
 			listarAutoresQtde(n.getEsquerda());
@@ -188,22 +188,24 @@ public class SistemaCatalogacao {
 
 	}
 
-	public void exibirLivroAutor() {
-		exibirLivroAutor(autores.getRaiz());
-	}
-
-	private void exibirLivroAutor(No n) {
-		if (n != null) {
-			autor = (Autor) n.getObjeto();
-			System.out.println("\nLivros do Autor: " + autor.getNome());
+	public boolean exibirLivroAutor(String nome) throws IOException {
+		autor = new Autor(nome);
+		No<Autor> no = autores.buscar(autor);
+		if (no != null) {
+			autor = no.getObjeto();
+			System.out.println("Livros do Autor " + autor.getNome() + "\n");
 			autor.exibirLivros();
-		}
-
-		if (n.getEsquerda() != null)
-			exibirLivroAutor(n.getEsquerda());
-
-		if (n.getDireita() != null)
-			exibirLivroAutor(n.getDireita());
+			arquivo = new File(nome+".csv");
+			if(!arquivo.exists()) 							
+				arquivo.createNewFile();
+			FileWriter escritor = new FileWriter(arquivo, true);
+			BufferedWriter buffer = new BufferedWriter(escritor);
+			buffer.write(autor.listagemLivros());
+			buffer.close();
+			escritor.close();
+			return true;
+		} else
+			return false;
 
 	}
 
@@ -211,48 +213,76 @@ public class SistemaCatalogacao {
 		livros.emOrdem();
 	}
 
-	public Livro buscarLivro(int codigo) {
-		No n = livros.buscar(codigo);
-		if (n != null)
-			return (Livro) n.getObjeto();
+	public Livro buscarLivro(int codigo) throws IOException {
+		livro = new Livro(codigo);
+		No<Livro> n = livros.buscar(livro);
+		if (n != null) {			
+			File arquivoLivro = new File(n.getObjeto().getTitulo()+".csv");
+			FileWriter escritor = new FileWriter(arquivoLivro);
+			BufferedWriter buffer = new BufferedWriter(escritor);
+			buffer.write(n.getObjeto().getLink());
+			buffer.close();
+			escritor.close();
+			return n.getObjeto();
+		}
 		else
 			return null;
 	}
 
-	public void exibirLivroAno(int codigo) {
-		No n = anos.buscar(codigo);
+	public boolean exibirLivroAno(int num_ano) throws IOException {
+		ano = new Ano(num_ano);
+		No n = anos.buscar(ano);
 		if (n != null) {
 			ano = (Ano) n.getObjeto();
 			System.out.println("\n\nLivros [" + ano.getAno() + "]");
 			ano.exibirLivros();
-		} else {
-			System.out.println("Não há livros no ano informado!");
-		}
+			File arquivoAno = new File(num_ano+".csv");
+			if(!arquivoAno.exists()) 							
+				arquivoAno.createNewFile();
+			FileWriter escritor = new FileWriter(arquivoAno);
+			BufferedWriter buffer = new BufferedWriter(escritor);
+			buffer.write(ano.listagemLivros());
+			buffer.close();
+			escritor.close();
+			return true;
+		} else 
+			return false;
+		
 	}
 
 	public void excluirLivro(int codigo) {
-		livros.remover(String.valueOf(codigo));
+		livro = new Livro(codigo);
+		No<Livro> n = livros.remover(livro);
+		autor = n.getObjeto().getAutor(); 
+		autor = (Autor) autores.buscar(autor).getObjeto();		
+		autor.removerLivro(n.getObjeto());
+		if(autor.getQuantidade() == 0)
+			autores.remover(autor);
+		ano = (Ano)anos.buscar(n.getObjeto().getAno()).getObjeto();
+		ano.removerLivro(n.getObjeto());
+		if(ano.getQuantidade() == 0)
+			anos.remover(ano);
 	}
 
 	public void verificar() {
 		verificar(livros.getRaiz());
 	}
 	
-	private No verificar(No n) {
-		System.out.println("\nNo: " + n.getCodigo());
-		if (n.getEsquerda() != null)
-			System.out.println("Esquerda: " + n.getEsquerda().getCodigo());
+	private No verificar(No no) {
+		System.out.println("\nNo: " + no.getObjeto().toString());
+		if (no.getEsquerda() != null)
+			System.out.println("Esquerda: " + no.getEsquerda().getObjeto().toString());
 
-		if (n.getDireita() != null) 
-			System.out.println("Direita: " + n.getDireita().getCodigo());
+		if (no.getDireita() != null) 
+			System.out.println("Direita: " + no.getDireita().getObjeto().toString());
 
-		if (n.getEsquerda() != null)
-		verificar(n.getEsquerda());
+		if (no.getEsquerda() != null)
+		verificar(no.getEsquerda());
 		
-		if (n.getDireita() != null)
-		verificar(n.getDireita());
+		if (no.getDireita() != null)
+		verificar(no.getDireita());
 		
-		return n;
+		return no;
 	}
 
 }
