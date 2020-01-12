@@ -12,7 +12,6 @@ public class Arvore<T extends Comparable<T>> {
 		raiz = null;		
 	}
 
-	
 	public void setRaiz(No raiz) {
 		this.raiz = raiz;
 	}
@@ -134,25 +133,6 @@ public class Arvore<T extends Comparable<T>> {
 		return no;
 	}
 
-	/**public boolean inserir(int codigo, T objeto) {
-		raiz = inserir(codigo, objeto, raiz);
-		return true;
-	}
-
-	public No inserir(int codigo, Object objeto, No<T> n) {
-		if (n == null)
-			n = new No(Integer.toString(codigo), objeto);
-		else if (codigo == Integer.parseInt(n.getCodigo()))
-			System.out.println(codigo + "Código de livro já utilizado!");
-		else if (codigo < Integer.parseInt(n.getCodigo()))
-			n.setEsquerda(inserir(codigo, objeto, n.getEsquerda()));
-		else if (codigo > Integer.parseInt(n.getCodigo()))
-			n.setDireita(inserir(codigo, objeto, n.getDireita()));
-
-		n = balancear(n);
-		return n;
-	}*/
-
 	public No<T> buscarMaior(){
 		return buscarMaior(raiz);
 	}
@@ -161,7 +141,7 @@ public class Arvore<T extends Comparable<T>> {
 		while (n.getDireita() != null) {
 			n = n.getDireita();
 		}
-		System.out.println("Maior elemento é: " + n.getValor());
+		System.out.println("Maior elemento é: " + n.getObjeto().toString());
 		return n;
 	}
 
@@ -173,10 +153,9 @@ public class Arvore<T extends Comparable<T>> {
 		while (n.getEsquerda() != null) {
 			n = n.getEsquerda();
 		}
-		System.out.println("Menor elemento é: " + n.getValor());
+		System.out.println("Menor elemento é: " + n.getObjeto().toString());
 		return n;
 	}
-
 
 	public No remover(T codigo) {
 		raiz = remover(codigo, raiz);
@@ -188,48 +167,51 @@ public class Arvore<T extends Comparable<T>> {
 			System.out.println("Elemento não encontrado para remoção!");
 			return null;
 		}
-		
-		System.out.println("Percorrendo No" + no.getObjeto());
-		if (no.compareTo(codigo) < 0) {
-			no.setEsquerda(remover(codigo, no.getEsquerda()));
-			return balancear(no);
-		} else if (no.compareTo(codigo) > 0) {
-			no.setDireita(remover(codigo, no.getDireita()));
-			return balancear(no);
-		} else {
-			if (no.getEsquerda() == null && no.getDireita() == null) {
+			
+		System.out.println("Percorrendo No" + no.getObjeto().toString());
+		if (no.compareTo(codigo) == 0) 
+		{
+			System.out.println("Encontradoow!");
+			if(no.getEsquerda() == null && no.getDireita() == null) {
 				return null;
 			}
-			else if (no.getEsquerda() == null) {
+			else if(no.getEsquerda() == null) {
 				return no.getDireita();
 			}
-			else if (no.getDireita() == null) {
+			else if(no.getDireita() == null) {
 				return no.getEsquerda();
 			}
-
-			// DOIS FILHOS
-			else if (no.getEsquerda() != null && no.getDireita() != null) {
-				no.setValor(buscarMaior(no.getDireita()).getObjeto());
-				no.setDireita(remover(no.getObjeto(), no.getDireita()));
-			} else {
+			else if(no.getEsquerda() != null && no.getDireita() != null) {
+				no.setObjeto(buscarMaior(no.getEsquerda()).getObjeto());
+				no.setEsquerda(remover(no.getObjeto(), no.getEsquerda()));
+			}
+			else 
 				if (no.getEsquerda() != null)
 					no = no.getEsquerda();
 				else
 					no = no.getDireita();
+			return balancear(no);
+							
 			}
+		else if(no.compareTo(codigo) > 0) {
+			no.setEsquerda(remover(codigo, no.getEsquerda()));
+			return balancear(no);
+		} else {
+			no.setDireita(remover(codigo, no.getDireita()));
+			return balancear(no);
 		}
-		return balancear(no);
+		
 	}
 
 	public No buscar(T codigo) {
 		return buscar(raiz, codigo);
 	}
 
-	private No buscar(No no, T codigo) {
+	private No buscar(No<T> no, T codigo) {
 		while (no != null) {
 			if (no.compareTo(codigo) == 0)
 				return no;
-			else if (no.compareTo(codigo) < 0)
+			else if (no.compareTo(codigo) > 0)
 				no = no.getEsquerda();
 			else
 				no = no.getDireita();
@@ -242,13 +224,14 @@ public class Arvore<T extends Comparable<T>> {
 	}
 
 	private void emOrdem(No<T> no) {
+		
+		if (no.getEsquerda() != null)
+			emOrdem(no.getEsquerda());
+		
 		if (no != null) {
 			Livro l = (Livro) no.getObjeto();
 			System.out.println("[" + l.getN_ebook() + "]" + " " + l.getTitulo());
-		}
-
-		if (no.getEsquerda() != null)
-			emOrdem(no.getEsquerda());
+		}	
 
 		if (no.getDireita() != null)
 			emOrdem(no.getDireita());

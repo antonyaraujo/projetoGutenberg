@@ -17,14 +17,15 @@ import Modelo.Livro;
 import Modelo.No;
 
 public class SistemaCatalogacao {
-	private	Arvore<Livro> livros = new Arvore<Livro>();
+	private Arvore<Livro> livros = new Arvore<Livro>();
 	private Arvore<Autor> autores = new Arvore<Autor>();
-	private	Arvore<Ano> anos = new Arvore<Ano>();
+	private Arvore<Ano> anos = new Arvore<Ano>();
 	private File arquivo = new File("base.csv");
 	Autor autor;
 	Ano ano;
 	Livro livro;
 	int qt = 0;
+
 	public int getQt() {
 		return qt;
 	}
@@ -72,7 +73,8 @@ public class SistemaCatalogacao {
 	}
 
 	/**
-	 * Acrescenta a arvore de livros os livros existentes em um arquivo de texto	 *
+	 * Acrescenta a arvore de livros os livros existentes em um arquivo de texto *
+	 * 
 	 * @param endereco
 	 * @return verdadeiro ou falso a depender da realizacao da operacao
 	 * @throws IOException
@@ -125,10 +127,12 @@ public class SistemaCatalogacao {
 	}
 
 	/**
-	 * Permite a chamada do metodo recusivo para escrever as informacoes dos livros no arquivo
+	 * Permite a chamada do metodo recusivo para escrever as informacoes dos livros
+	 * no arquivo
+	 * 
 	 * @param void
-	 * @return True 
-	 * */
+	 * @return True
+	 */
 	public boolean gravarLivros() throws IOException {
 		gravarLivros(livros.getRaiz());
 		return true;
@@ -136,8 +140,9 @@ public class SistemaCatalogacao {
 
 	/**
 	 * Metodo recursivo que permite a escrita de um livro em uma linha do arquivo
+	 * 
 	 * @return void
-	 * */
+	 */
 	private void gravarLivros(No n) throws IOException {
 		if (n != null) {
 			Livro livro = (Livro) n.getObjeto();
@@ -145,7 +150,7 @@ public class SistemaCatalogacao {
 					+ String.copyValueOf(livro.getMes()) + ";" + livro.getAno() + ";" + livro.getLink();
 			if (arquivo.exists()) {
 				if (buscarLivro(livro.getN_ebook()) == null) {
-					FileWriter escritor = new FileWriter(arquivo, true);
+					FileWriter escritor = new FileWriter(arquivo);
 					BufferedWriter buffer = new BufferedWriter(escritor);
 					buffer.write(livroTexto);
 					buffer.newLine();
@@ -167,8 +172,7 @@ public class SistemaCatalogacao {
 			System.out.println("Autor [Quantidade]");
 			listarAutoresQtde(autores.getRaiz());
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
 
@@ -178,7 +182,7 @@ public class SistemaCatalogacao {
 			if (autor.getQuantidade() > 1)
 				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livros]");
 			else
-				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livro]");						
+				System.out.println(autor.getNome() + " [" + autor.getQuantidade() + " livro]");
 		}
 		if (n.getEsquerda() != null)
 			listarAutoresQtde(n.getEsquerda());
@@ -195,8 +199,8 @@ public class SistemaCatalogacao {
 			autor = no.getObjeto();
 			System.out.println("Livros do Autor " + autor.getNome() + "\n");
 			autor.exibirLivros();
-			arquivo = new File(nome+".csv");
-			if(!arquivo.exists()) 							
+			arquivo = new File(nome + ".csv");
+			if (!arquivo.exists())
 				arquivo.createNewFile();
 			FileWriter escritor = new FileWriter(arquivo, true);
 			BufferedWriter buffer = new BufferedWriter(escritor);
@@ -216,16 +220,15 @@ public class SistemaCatalogacao {
 	public Livro buscarLivro(int codigo) throws IOException {
 		livro = new Livro(codigo);
 		No<Livro> n = livros.buscar(livro);
-		if (n != null) {			
-			File arquivoLivro = new File(n.getObjeto().getTitulo()+".csv");
+		if (n != null) {
+			File arquivoLivro = new File(n.getObjeto().getTitulo() + ".csv");
 			FileWriter escritor = new FileWriter(arquivoLivro);
 			BufferedWriter buffer = new BufferedWriter(escritor);
 			buffer.write(n.getObjeto().getLink());
 			buffer.close();
 			escritor.close();
 			return n.getObjeto();
-		}
-		else
+		} else
 			return null;
 	}
 
@@ -236,8 +239,8 @@ public class SistemaCatalogacao {
 			ano = (Ano) n.getObjeto();
 			System.out.println("\n\nLivros [" + ano.getAno() + "]");
 			ano.exibirLivros();
-			File arquivoAno = new File(num_ano+".csv");
-			if(!arquivoAno.exists()) 							
+			File arquivoAno = new File(num_ano + ".csv");
+			if (!arquivoAno.exists())
 				arquivoAno.createNewFile();
 			FileWriter escritor = new FileWriter(arquivoAno);
 			BufferedWriter buffer = new BufferedWriter(escritor);
@@ -245,43 +248,53 @@ public class SistemaCatalogacao {
 			buffer.close();
 			escritor.close();
 			return true;
-		} else 
+		} else
 			return false;
-		
+
 	}
 
-	public void excluirLivro(int codigo) {
-		livro = new Livro(codigo);
-		No<Livro> n = livros.remover(livro);
-		autor = n.getObjeto().getAutor(); 
-		autor = (Autor) autores.buscar(autor).getObjeto();		
-		autor.removerLivro(n.getObjeto());
-		if(autor.getQuantidade() == 0)
-			autores.remover(autor);
-		ano = (Ano)anos.buscar(n.getObjeto().getAno()).getObjeto();
-		ano.removerLivro(n.getObjeto());
-		if(ano.getQuantidade() == 0)
-			anos.remover(ano);
+	public void excluirLivro(int codigo) throws IOException {
+		livro = buscarLivro(codigo);
+		if (livro != null) {
+			livros.remover(livro);			
+				autor = livro.getAutor();
+				if (autor != null) {					
+					autor.removerLivro(livro);
+					if (autor.getQuantidade() == 0)
+						autores.remover(autor);
+				ano = livro.getAno();
+				if (ano != null) {					
+					ano.removerLivro(livro);
+					if (ano.getQuantidade() == 0)
+						anos.remover(ano);
+				}
+				
+			}
+		}
+	}
+	
+	public void exibirEmOdem() {
+		livros.emOrdem();
 	}
 
 	public void verificar() {
 		verificar(livros.getRaiz());
 	}
-	
+
 	private No verificar(No no) {
 		System.out.println("\nNo: " + no.getObjeto().toString());
 		if (no.getEsquerda() != null)
 			System.out.println("Esquerda: " + no.getEsquerda().getObjeto().toString());
 
-		if (no.getDireita() != null) 
+		if (no.getDireita() != null)
 			System.out.println("Direita: " + no.getDireita().getObjeto().toString());
 
 		if (no.getEsquerda() != null)
-		verificar(no.getEsquerda());
-		
+			verificar(no.getEsquerda());
+
 		if (no.getDireita() != null)
-		verificar(no.getDireita());
-		
+			verificar(no.getDireita());
+
 		return no;
 	}
 

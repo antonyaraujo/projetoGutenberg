@@ -13,15 +13,7 @@ public class No<T extends Comparable<T>> implements Comparable<T>{
 		this.comparador = comparador;
 		esquerda = direita = null;
 		altura = 0;
-	}
-	
-	public T getValor() {
-		return objeto;
-	}
-	
-	public void setValor(Object Object) {
-		this.objeto = objeto;
-	}
+	}	
 	
 	public No<T> getEsquerda() {
 		return esquerda;

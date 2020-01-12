@@ -121,6 +121,7 @@ public class ClubeDoLivro {
 				break;
 			case 11:
 				System.out.println(batata.getQt());
+				batata.exibirEmOdem();
 				break;
 			case 0:
 				if (salvar) {
