@@ -92,7 +92,7 @@ public class ClubeDoLivro {
 			case 6:
 				/** Listar - Livros */
 				System.out.println("Todos os Livros cadastrados");
-				batata.exibirLivros();
+				batata.exibirEmOdem();
 				break;
 			case 7:
 				/** Buscar Livro */

@@ -25,7 +25,7 @@ public class SistemaCatalogacao {
 	Ano ano;
 	Livro livro;
 	int qt = 0;
-
+	
 	public int getQt() {
 		return qt;
 	}
@@ -128,10 +128,8 @@ public class SistemaCatalogacao {
 
 	/**
 	 * Permite a chamada do metodo recusivo para escrever as informacoes dos livros
-	 * no arquivo
-	 * 
-	 * @param void
-	 * @return True
+	 * no arquivo 
+	 * @return true - representa o sucesso da operacao
 	 */
 	public boolean gravarLivros() throws IOException {
 		gravarLivros(livros.getRaiz());
@@ -140,7 +138,7 @@ public class SistemaCatalogacao {
 
 	/**
 	 * Metodo recursivo que permite a escrita de um livro em uma linha do arquivo
-	 * 
+	 * @param n - recebe cada no existente da arvore
 	 * @return void
 	 */
 	private void gravarLivros(No n) throws IOException {
@@ -167,6 +165,11 @@ public class SistemaCatalogacao {
 		}
 	}
 
+	/**
+	 * Metodo publico que serve para chamada do metodo recursivo de mesmo nome
+	 * @return true - se a operacao de listagem for realizada com sucesso
+	 * @return false - se ocorrer erro na listagem 
+	 */
 	public boolean listarAutoresQtde() {
 		if (autores.getRaiz() != null) {
 			System.out.println("Autor [Quantidade]");
@@ -176,6 +179,10 @@ public class SistemaCatalogacao {
 			return false;
 	}
 
+	/**
+	 * Metodo recursivo que permite a exibicao do nome do autor e a quantidade de livros que este possui
+	 * @param n - representa um no da arvore que sera percorrida
+	 * */
 	private void listarAutoresQtde(No n) {
 		if (n != null) {
 			autor = (Autor) n.getObjeto();
@@ -192,6 +199,13 @@ public class SistemaCatalogacao {
 
 	}
 
+	/**
+	 * Metodo que permite a exibicao dos livros de um dado autor e o armazenamento destes em um arquivo com o nome do autor+.csv
+	 * @param nome - recebe uma String que representa o nome do Autor de referencia a ser buscado
+	 * @return true - se todas as operacoes forem realizadas com sucesso
+	 * @return false - caso ocorra algum erro nas operacoes de busca e escrita
+	 * @throws IOException -  coleta erro de excecao do sistema para lidar com arquivos
+	 */
 	public boolean exibirLivroAutor(String nome) throws IOException {
 		autor = new Autor(nome);
 		No<Autor> no = autores.buscar(autor);
@@ -213,10 +227,13 @@ public class SistemaCatalogacao {
 
 	}
 
-	public void exibirLivros() {
-		livros.emOrdem();
-	}
-
+	/**
+	 * Permite a busca de um livro na arvore livros a partir de um dado codigo 
+	 * @param codigo - valor inteiro que representa o n_ebook do livro que deseja-se ser encotnrado
+	 * @return livro - caso exista um livro com o codigo informado na arvore livros o objeto livro correspondente e retornado
+	 * @return null - caso o livro com o codigo informado nao exista na arvore livros
+	 * @throws IOException
+	 */
 	public Livro buscarLivro(int codigo) throws IOException {
 		livro = new Livro(codigo);
 		No<Livro> n = livros.buscar(livro);
@@ -232,6 +249,13 @@ public class SistemaCatalogacao {
 			return null;
 	}
 
+	/**
+	 * Metodo que permite a exibicao dos livros publicados em um dado ano e o armazenamento destes em um arquivo com o nome do ano+.csv
+	 * @param num_ano - recebe um inteiro que representa o ano de referencia a ser buscado
+	 * @return true - se todas as operacoes forem realizadas com sucesso
+	 * @return false - caso ocorra algum erro nas operacoes de busca e escrita
+	 * @throws IOException -  coleta erro de excecao do sistema para lidar com arquivos
+	 */
 	public boolean exibirLivroAno(int num_ano) throws IOException {
 		ano = new Ano(num_ano);
 		No n = anos.buscar(ano);
@@ -253,7 +277,13 @@ public class SistemaCatalogacao {
 
 	}
 
-	public void excluirLivro(int codigo) throws IOException {
+	/**
+	 * Metodo que permite a exclusao de um livro na arvore livros a partir de um codigo inteiro
+	 * @param codigo - inteiro que representa um n_ebook a ser buscado e excluido da arvore livros
+	 * @return true - se o livro for excluido da arvore livros e das ArrayLists do seu autor e ano de publicacao
+	 * @return false - se o livro nao for excluido da arvore livros e nem das ArrayLists de seu autor e ano de publicacao
+	 * */
+	public boolean excluirLivro(int codigo) throws IOException {
 		livro = buscarLivro(codigo);
 		if (livro != null) {
 			livros.remover(livro);			
@@ -265,22 +295,36 @@ public class SistemaCatalogacao {
 				ano = livro.getAno();
 				if (ano != null) {					
 					ano.removerLivro(livro);
-					if (ano.getQuantidade() == 0)
+					if (ano.getQuantidade() == 0) {
 						anos.remover(ano);
+						return true;
+					}
 				}
 				
 			}
 		}
+		return false;
 	}
 	
+	/**
+	 * Metodo que chama a exibicao o metodo dos elementos da arvore em ordem
+	 * */
 	public void exibirEmOdem() {
 		livros.emOrdem();
 	}
 
+	/**
+	 * Metodo publico que serve para chamada do metodo recursivo de mesmo nome
+	 */
 	public void verificar() {
 		verificar(livros.getRaiz());
 	}
 
+	/**
+	 * Metodo recursivo que permite verificar manualmente e visualmente o balanceamento da arvore
+	 * @param no - recebe um determinado no da arvore
+	 * @return no 
+	 */
 	private No verificar(No no) {
 		System.out.println("\nNo: " + no.getObjeto().toString());
 		if (no.getEsquerda() != null)
